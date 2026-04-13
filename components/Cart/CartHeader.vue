@@ -1,19 +1,30 @@
 <template>
-  <header class="header">
+  <div class="cart-header">
     <div class="container">
-      <div class="header__wrapper">
-        <div class="header__logo">
-          <h1>Магазин</h1>
+      <div class="cart-header__wrapper">
+        <div class="cart-header__logo">
+          <NuxtLink to="/" class="cart-header__link">
+            <h2>Магазин</h2>
+          </NuxtLink>
         </div>
-        <div class="header__cart">
-          <NuxtLink to="/pages" class="header__cart-link">
-            🛒 Корзина
-            <span class="header__cart-count">{{ cartStore.totalItems }}</span>
+        <div class="cart-header__info">
+          <NuxtLink to="/" class="cart-header__cart-link">
+            <div class="cart-header__item">
+              <!-- Иконка корзины 32x32 -->
+                <img class="cart-header__icon" src="../../assets/imagines/cartIcon.png">
+              <div class="cart-header__text">
+                <div class="cart-header__label">Ваша корзина</div>
+                <div class="cart-header__values">
+                  <span class="cart-header__count">{{ cartStore.totalItems }} товара</span>
+                  <span class="cart-header__total">{{ cartStore.totalPrice.toLocaleString() }} ₽</span>
+                </div>
+              </div>
+            </div>
           </NuxtLink>
         </div>
       </div>
     </div>
-  </header>
+  </div>
 </template>
 
 <script setup>
@@ -23,12 +34,9 @@ const cartStore = useCartStore()
 </script>
 
 <style scoped>
-.header {
+.cart-header {
   background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 15px 0;
 }
 
 .container {
@@ -37,38 +45,84 @@ const cartStore = useCartStore()
   padding: 0 20px;
 }
 
-.header__wrapper {
+.cart-header__wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
 }
 
-.header__logo h1 {
+.cart-header__logo h2 {
   margin: 0;
-  font-size: 24px;
   color: #333;
 }
 
-.header__cart-link {
+.cart-header__link {
   text-decoration: none;
-  color: #333;
-  font-size: 18px;
+}
+
+.cart-header__cart-link {
+  text-decoration: none;
+}
+
+.cart-header__info {
+  display: flex;
+  gap: 20px;
+}
+
+.cart-header__item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-.header__cart-count {
-  background: #4caf50;
-  color: white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
+.cart-header__icon {
+  width: 32px;
+  height: 32px;
+  color: #4caf50;
+  display: flex;
   align-items: center;
-  justify-content: center;
+}
+
+.cart-header__icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.cart-header__text {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Стиль для "Ваша корзина" */
+.cart-header__label {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
   font-size: 14px;
-  font-weight: bold;
+  color: #333;
+  background: transparent;
+}
+
+.cart-header__values {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cart-header__count {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #797B86;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.cart-header__total {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #1F2432;
+  border-radius: 4px;
+  display: inline-block;
 }
 </style>

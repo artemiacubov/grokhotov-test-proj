@@ -1,32 +1,33 @@
 import { defineStore } from 'pinia'
+import type { CartItem, Product, OrderResponse } from '~/type/type.ts'
+
 
 export const useCartStore = defineStore('cart', {
     state: () => ({
-        items: []
+        items: [] as CartItem[],
+        hasInstallation: false
     }),
 
     getters: {
-        totalItems: (state) => {
+        totalItems: (state): number => {
             return state.items.reduce((sum, item) => sum + item.quantity, 0)
         },
 
-        totalPrice: (state) => {
+        totalPrice: (state): number => {
             return state.items.reduce((sum, item) => {
-                const itemTotal = item.price * item.quantity
-                const installationTotal = item.hasInstallation ? item.installationPrice : 0
-                return sum + itemTotal + installationTotal
+                return sum + (item.price * item.quantity)
             }, 0)
         },
 
-        hasAnyInstallation: (state) => {
-            return state.items.some(item => item.hasInstallation)
+        hasAnyInstallation: (state): boolean => {
+            return state.hasInstallation
         },
 
-        cartItems: (state) => state.items
+        cartItems: (state): CartItem[] => state.items
     },
 
     actions: {
-        addToCart(product) {
+        addToCart(product: Product): void {
             const existingItem = this.items.find(item => item.id === product.id)
 
             if (existingItem) {
@@ -37,21 +38,20 @@ export const useCartStore = defineStore('cart', {
                     name: product.name,
                     price: product.price,
                     quantity: 1,
-                    hasInstallation: false,
-                    installationPrice: product.installationPrice || 1500,
                     image: product.image,
                     description: product.description,
+                    shortDescription: product.shortDescription,
                     article: product.article || `${product.name}${Math.floor(Math.random() * 1000)}`
                 })
             }
         },
 
-        increaseQuantity(itemId) {
+        increaseQuantity(itemId: number): void {
             const item = this.items.find(i => i.id === itemId)
             if (item) item.quantity++
         },
 
-        decreaseQuantity(itemId) {
+        decreaseQuantity(itemId: number): void {
             const item = this.items.find(i => i.id === itemId)
             if (item && item.quantity > 1) {
                 item.quantity--
@@ -60,22 +60,20 @@ export const useCartStore = defineStore('cart', {
             }
         },
 
-        removeItem(itemId) {
+        removeItem(itemId: number): void {
             this.items = this.items.filter(i => i.id !== itemId)
         },
 
-        toggleInstallation(itemId) {
-            const item = this.items.find(i => i.id === itemId)
-            if (item) item.hasInstallation = !item.hasInstallation
+        clearCart(): void {
+            this.items = []
+            this.hasInstallation = false
         },
 
-        toggleAllInstallations(value) {
-            this.items.forEach(item => {
-                item.hasInstallation = value
-            })
+        toggleAllInstallations(value: boolean): void {
+            this.hasInstallation = value
         },
 
-        async submitOrder() {
+        async submitOrder(): Promise<boolean> {
             if (this.items.length === 0) {
                 alert('Корзина пуста!')
                 return false
@@ -85,11 +83,12 @@ export const useCartStore = defineStore('cart', {
                 items: this.items,
                 totalPrice: this.totalPrice,
                 totalItems: this.totalItems,
+                hasInstallation: this.hasInstallation,
                 orderDate: new Date().toISOString()
             }
 
             try {
-                const response = await $fetch('/api/order', {
+                const response = await $fetch<OrderResponse>('/api/order', {
                     method: 'POST',
                     body: orderData
                 })
@@ -97,8 +96,10 @@ export const useCartStore = defineStore('cart', {
                 if (response.success) {
                     alert(`Заказ №${response.orderId} успешно оформлен на сумму ${this.totalPrice.toLocaleString()} ₽!`)
                     this.items = []
+                    this.hasInstallation = false
                     return true
                 }
+                return false
             } catch (error) {
                 console.error('Ошибка при оформлении заказа:', error)
                 alert('Ошибка при оформлении заказа')
