@@ -17,7 +17,7 @@
         <input
             type="checkbox"
             :checked="item.hasInstallation"
-            @change="cartStore.toggleInstallation(item.id)"
+            @change="cartStore.toggleAllInstallations(item.id)"
         >
         <span>Установка (+{{ item.installationPrice }} ₽)</span>
       </label>

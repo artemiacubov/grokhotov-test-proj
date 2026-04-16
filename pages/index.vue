@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import { useCartStore } from '~/stores/cart'
-import type { Product } from '~/stores/cart'
+import type { Product } from '~/type/type'
 import CartItemList from '~/components/Cart/CartItemList.vue'
 import ViewedProductsSlider from '~/components/Products/ViewedProductsSlider.vue'
 
